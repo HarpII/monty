@@ -1,61 +1,61 @@
 #include "monty.h"
 
 /**
- * is_number - iterates each character of string to check of isdigit
- * @n: integer
- * Return: 0 if is number, else -1 if not
+ * free_stack - Frees a stack_t stack.
+ * @stack: A pointer to the top (stack) or
+ *         bottom (queue) of a stack_t.
  */
-int is_number(const char *n)
+void free_stack(stack_t **stack)
 {
-	int i = 0;
+	stack_t *tmp = *stack;
 
-	if (*n == '-')
-		i = 1;
-	for (; *(n + i) != '\0'; i++)
+	while (*stack)
 	{
-		if (isdigit(*(n + i)) == 0)
-			return (-1);
-	}
-	return (0);
-}
-/**
- * push - adds node to the start of dlinkedlist
- * @h: head of linked list (node at the bottom of stack)
- * @line_number: bytecode line number
- * @n: integer
- */
-void push(stack_t **h, unsigned int line_number, const char *n)
-{
-	if (!h)
-		return;
-	if (is_number(n) == -1)
-	{
-		printf("L%u: usage: push integer\n", line_number);
-		free_dlist(h);
-		exit(EXIT_FAILURE);
-	}
-	else
-	{
-		if (add_end_node(h, atoi(n)) == -1)
-		{
-			free_dlist(h);
-			exit(EXIT_FAILURE);
-		}
+		tmp = (*stack)->next;
+		free(*stack);
+		*stack = tmp;
 	}
 }
+
 /**
- * pop - removes node at front of dlinkedlist
- * @h: head of linked list (node at the bottom of stack)
- * @line_number: bytecode line number
+ * init_stack - Initializes a stack_t stack with beginning
+ *              stack and ending queue nodes.
+ * @stack: A pointer to an unitialized stack_t stack.
+ *
+ * Return: If an error occurs - EXIT_FAILURE.
+ *         Otherwise - EXIT_SUCCESS.
  */
-void pop(stack_t **h, unsigned int line_number)
+int init_stack(stack_t **stack)
 {
-	if (h == NULL || *h == NULL)
-	{
-		printf("L%u: can't pop an empty stack\n", line_number);
-		free_dlist(h);
-		exit(EXIT_FAILURE);
-	}
-	else
-		delete_end_node(h);
+	stack_t *s;
+
+	s = malloc(sizeof(stack_t));
+	if (s == NULL)
+		return (malloc_error());
+
+	s->n = STACK;
+	s->prev = NULL;
+	s->next = NULL;
+
+	*stack = s;
+
+	return (EXIT_SUCCESS);
+}
+
+/**
+ * check_mode - Checks if a stack_t linked list is in stack or queue mode.
+ * @stack: A pointer to the top (stack) or bottom (queue)
+ *         of a stack_t linked list.
+ *
+ * Return: If the stack_t is in stack mode - STACK (0).
+ *         If the stack_t is in queue mode - QUEUE (1).
+ *         Otherwise - 2.
+ */
+int check_mode(stack_t *stack)
+{
+	if (stack->n == STACK)
+		return (STACK);
+	else if (stack->n == QUEUE)
+		return (QUEUE);
+	return (2);
 }
